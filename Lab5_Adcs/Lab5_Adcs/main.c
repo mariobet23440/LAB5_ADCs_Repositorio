@@ -2,13 +2,15 @@
  * LABORATORIO 5 - ADCs
  *
  * Created: 3/04/2025 14:05:25
- * Author : mario
+ * Author : Mario Alejandro Betancourt Franco
  */ 
 
 // LIBRERÍAS
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+// VARIABLES GLOBALES
+unsigned char z = 0;
 
 int main(void)
 {	
@@ -32,7 +34,23 @@ int main(void)
 
 // RUTINAS DE INTERRUPCIÓN
 ISR(PCINT0_vect)
-{
-	PORTD ^= (1<<5);	// Encender y apagar el bit 5 de PORTD siempre que un botón cambie de estado.
+{	
+	unsigned char temp = PIND;
+	
+	switch (PINB)
+	{
+	// Estas operaciones se dejaron en este formato por posibles cambios de compilador
+	case (1 << PINB1):
+		temp = temp + 1;
+		break;
+		
+	case (1 << PINB0):
+		temp = temp - 1;
+		break;
+		
+	default :
+		break;
+	}
+	PORTD = temp;
 }
 
