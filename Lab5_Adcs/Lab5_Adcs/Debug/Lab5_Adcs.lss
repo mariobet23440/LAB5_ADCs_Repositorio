@@ -335,14 +335,14 @@ ISR(TIMER0_OVF_vect)
  1d2:	91 f0       	breq	.+36     	; 0x1f8 <__vector_16+0x52>
  1d4:	82 30       	cpi	r24, 0x02	; 2
  1d6:	a9 f4       	brne	.+42     	; 0x202 <__vector_16+0x5c>
-	{
 		case (1 << PINC1):
 		{
 			// MOSTRAR CONTADOR
 			temp2 = (1 << PINC2);  // Activamos PC2
-			show_number(adc_hi);
- 1d8:	80 91 22 01 	lds	r24, 0x0122	; 0x800122 <adc_hi>
- 1dc:	90 91 23 01 	lds	r25, 0x0123	; 0x800123 <adc_hi+0x1>
+			//show_number(adc_hi);
+			show_number(contador);
+ 1d8:	80 91 20 01 	lds	r24, 0x0120	; 0x800120 <__data_end>
+ 1dc:	90 91 21 01 	lds	r25, 0x0121	; 0x800121 <__data_end+0x1>
  1e0:	0e 94 60 00 	call	0xc0	; 0xc0 <show_number>
 	switch (temp1)
 	{
@@ -351,17 +351,18 @@ ISR(TIMER0_OVF_vect)
 			// MOSTRAR CONTADOR
 			temp2 = (1 << PINC2);  // Activamos PC2
  1e4:	24 e0       	ldi	r18, 0x04	; 4
-			show_number(adc_hi);
+			//show_number(adc_hi);
+			show_number(contador);
 			break;	
  1e6:	0e c0       	rjmp	.+28     	; 0x204 <__vector_16+0x5e>
-		
 		case (1 << PINC2):
 		{	
 			// MOSTRAR NÚMERO 2
 			temp2 = (1 << PINC3);  // Activamos PC3
-			show_number(adc_lo);
- 1e8:	80 91 24 01 	lds	r24, 0x0124	; 0x800124 <adc_lo>
- 1ec:	90 91 25 01 	lds	r25, 0x0125	; 0x800125 <adc_lo+0x1>
+			//show_number(adc_lo);
+			show_number(contador);
+ 1e8:	80 91 20 01 	lds	r24, 0x0120	; 0x800120 <__data_end>
+ 1ec:	90 91 21 01 	lds	r25, 0x0121	; 0x800121 <__data_end+0x1>
  1f0:	0e 94 60 00 	call	0xc0	; 0xc0 <show_number>
 		}
 		
@@ -370,7 +371,8 @@ ISR(TIMER0_OVF_vect)
 			// MOSTRAR NÚMERO 2
 			temp2 = (1 << PINC3);  // Activamos PC3
  1f4:	28 e0       	ldi	r18, 0x08	; 8
-			show_number(adc_lo);
+			//show_number(adc_lo);
+			show_number(contador);
 			break;	
  1f6:	06 c0       	rjmp	.+12     	; 0x204 <__vector_16+0x5e>
 		case (1 << PINC3):

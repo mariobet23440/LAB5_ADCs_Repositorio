@@ -83,9 +83,7 @@ int main(void)
 	sei();
 	
 	// MAINLOOP
-    while (1)
-	{
-	}
+    while (1);
 	
 	return 0;
 }
@@ -124,7 +122,8 @@ ISR(TIMER0_OVF_vect)
 		{
 			// MOSTRAR CONTADOR
 			temp2 = (1 << PINC2);  // Activamos PC2
-			show_number(adc_hi);
+			//show_number(adc_hi);
+			show_number(contador);
 			break;	
 		}
 		
@@ -132,7 +131,8 @@ ISR(TIMER0_OVF_vect)
 		{	
 			// MOSTRAR NÚMERO 2
 			temp2 = (1 << PINC3);  // Activamos PC3
-			show_number(adc_lo);
+			//show_number(adc_lo);
+			show_number(contador);
 			break;	
 		}
 		
