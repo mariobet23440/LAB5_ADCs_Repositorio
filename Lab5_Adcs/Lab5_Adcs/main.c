@@ -22,9 +22,10 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-unsigned int contador = 0;
-unsigned int adc_lo;
-unsigned int adc_hi;
+// Variables
+unsigned char contador = 0;
+unsigned char adc_lo;
+unsigned char adc_hi;
 
 // PROTOTIPOS DE FUNCIONES
 int reset_timer0(void)
@@ -39,17 +40,29 @@ int reset_timer0(void)
 }
 
 // Mostrar números en Displays
-int show_number(int num)
+void show_number(unsigned char num)
 {
-	unsigned int Tabla[] = {0x77, 0x44, 0x6B, 0x6D, 0x5C, 0x3D, 0x3F, 0x64, 0x7F, 0x7C, 0x5F, 0x3E, 0x39, 0x7A, 0x3F, 0x5F};
+	unsigned int Tabla[] = {0x77, 0x42, 0x6D, 0x6B, 0x5A, 0x3B, 0x3F, 0x62, 0x7F, 0x7A, 0x7E, 0x1F, 0x35, 0x4F, 0x3D, 0x3C};
 	PORTD = Tabla[num];
-	return 0;
 }
 
+// Sacar el nibble bajo de un número de 1 byte
+unsigned char low_nibble(char num)
+{
+	unsigned char low_nib = num & 0x0F; // Aplicamos una máscara sólo para los últimos 4 bits
+	return low_nib;
+}
+
+// Sacar el nibble alto de un número de 1 byte
+unsigned char high_nibble(char num)
+{
+	unsigned char high_nib = (num >> 4); // Aplicamos una máscara sólo para los últimos 4 bits
+	return high_nib;
+}
 
 void setup_adc(void)
 {
-	ADMUX  = (1 << REFS0) | (1 << MUX2);   // Seleccionar el canal ADC4
+	ADMUX  = (1 << ADLAR) | (1 << REFS0) | (1 << MUX2);   // Seleccionar el canal ADC4 y fuente AVCC (Descartar últimos 2 bits)
 	ADCSRA = (1 << ADEN) | (1 << ADIE);
 	ADCSRA |= (1 << ADPS2) | (1 << ADPS1);  // Establecer prescaler de 64
 	ADCSRA |= (1 << ADSC);
@@ -59,7 +72,7 @@ void setup_adc(void)
 int main(void)
 {	
 	// CONFIGURACIÓN DE PUERTOS
-	DDRB = 0X00;							// El puerto B es de entradas
+	DDRB = (1 << 5);						// PB5 es salida
 	PORTB = (1 << 0) | (1 << 1);			// Habilitar pull-ups en PORTB
 	DDRC = (1 << 1) | (1 << 2) | (1 << 3);	// BITS 1-3 del puerto C son salidas
 	PORTC = (1 << PORTC1);					// Encender el bit 1 de PORTC
@@ -83,16 +96,33 @@ int main(void)
 	sei();
 	
 	// MAINLOOP
-    while (1);
+    while (1)
+	{
+		//unsigned char temp = ADCL;
+		
+		// ENCENDER ALARMA SI ADCL es mayor a contador
+		if(adc_hi > contador)
+		{
+			PORTB |= (1 << PORTB5);		// Encender sólo PB5
+		}	
+		else
+		{
+			PORTB &= ~(1 << PORTB5);	// Apagar solo PB5
+		}
+	}
 	
 	return 0;
 }
 
 
+
+
 // RUTINAS DE INTERRUPCIÓN
 ISR(PCINT0_vect)
 {	
-	switch (PINB)
+	unsigned char temp = PINB & 0b00000011;  // Quedarnos con solo PB0 y PB1
+	
+	switch (temp)
 	{
 	// Estas operaciones se dejaron en este formato por posibles cambios de compilador
 	case (1 << PINB1):
@@ -122,8 +152,8 @@ ISR(TIMER0_OVF_vect)
 		{
 			// MOSTRAR CONTADOR
 			temp2 = (1 << PINC2);  // Activamos PC2
-			//show_number(adc_hi);
-			show_number(contador);
+			//show_number(adc_hi); Mostrar ADCH
+			show_number(high_nibble(adc_hi));
 			break;	
 		}
 		
@@ -131,8 +161,8 @@ ISR(TIMER0_OVF_vect)
 		{	
 			// MOSTRAR NÚMERO 2
 			temp2 = (1 << PINC3);  // Activamos PC3
-			//show_number(adc_lo);
-			show_number(contador);
+			//show_number(adc_lo); // Mostrar ADCL
+			show_number(low_nibble(adc_hi));
 			break;	
 		}
 		
